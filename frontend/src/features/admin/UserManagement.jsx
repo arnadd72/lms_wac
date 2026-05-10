@@ -3,7 +3,7 @@ import {
   Users, Search, Filter, Plus, 
   MoreVertical, Edit2, Trash2, Shield, 
   Mail, Phone, Calendar, UserCheck, X,
-  Key, CheckCircle, AlertCircle
+  Key, CheckCircle, AlertCircle, RefreshCw
 } from 'lucide-react';
 import { adminApi } from '../../utils/api';
 
