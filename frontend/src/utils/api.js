@@ -28,4 +28,30 @@ api.interceptors.response.use(
   }
 );
 
+export const adminApi = {
+  getStats: () => api.get('/admin/stats'),
+  
+  // Users
+  getUsers: (params) => api.get('/admin/users', { params }),
+  createUser: (data) => api.post('/admin/users', data),
+  updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+  resetPassword: (id, password) => api.post(`/admin/users/${id}/reset-password`, { password }),
+
+  // Courses
+  getCourses: (params) => api.get('/admin/courses', { params }),
+  updateCourseStatus: (id, status, feedback) => api.put(`/admin/courses/${id}/status`, { status, feedback }),
+
+  // Categories
+  getCategories: () => api.get('/categories'),
+  createCategory: (data) => api.post('/admin/categories', data),
+  updateCategory: (id, data) => api.put(`/admin/categories/${id}`, data),
+  deleteCategory: (id) => api.delete(`/admin/categories/${id}`),
+
+  // Settings
+  getSettings: () => api.get('/admin/settings'),
+  updateSettings: (settings) => api.post('/admin/settings', { settings }),
+  clearCache: () => api.post('/admin/clear-cache'),
+};
+
 export default api;

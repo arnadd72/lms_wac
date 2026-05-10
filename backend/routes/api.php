@@ -38,7 +38,24 @@ Route::middleware('auth:sanctum')->group(function () {
     // Admin
     Route::prefix('admin')->group(function () {
         Route::get('stats', [AdminController::class, 'dashboardStats']);
+        
+        // User Management
         Route::get('users', [AdminController::class, 'users']);
+        Route::post('users', [AdminController::class, 'storeUser']);
+        Route::put('users/{id}', [AdminController::class, 'updateUser']);
+        Route::delete('users/{id}', [AdminController::class, 'deleteUser']);
+        Route::post('users/{id}/reset-password', [AdminController::class, 'resetUserPassword']);
+
+        // Course Management
         Route::get('courses', [AdminController::class, 'courses']);
+        Route::put('courses/{id}/status', [AdminController::class, 'updateCourseStatus']);
+
+        // Category Management
+        Route::apiResource('categories', CategoryController::class)->except(['index']);
+
+        // Settings
+        Route::get('settings', [AdminController::class, 'getSettings']);
+        Route::post('settings', [AdminController::class, 'updateSettings']);
+        Route::post('clear-cache', [AdminController::class, 'clearCache']);
     });
 });

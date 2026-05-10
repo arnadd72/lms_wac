@@ -1,24 +1,32 @@
-import { Award, ShieldCheck, Download, Search, Filter, MoreVertical, ExternalLink } from 'lucide-react';
-
-const ISSUED_CERTIFICATES = [
-  { id: 'CERT-2026-001', student: 'Rina Handayani', course: 'Excel Mastery', date: '10 Mei 2026', code: 'WAC-EX-9921' },
-  { id: 'CERT-2026-002', student: 'Budi Santoso', course: 'Word Professional', date: '08 Mei 2026', code: 'WAC-WD-1104' },
-  { id: 'CERT-2026-003', student: 'Ahmad Fauzi', course: 'PowerPoint Pro', date: '05 Mei 2026', code: 'WAC-PP-3392' },
-];
+import { useState, useEffect } from 'react';
+import { 
+  Award, ShieldCheck, Download, Search, 
+  Filter, MoreVertical, ExternalLink, RefreshCw 
+} from 'lucide-react';
+import { adminApi } from '../../utils/api';
 
 export default function AdminCertificatesPage() {
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+  const ISSUED_CERTIFICATES = [
+    { id: 'CERT-2026-001', student: 'Rina Handayani', course: 'Excel Mastery', date: '10 Mei 2026', code: 'WAC-EX-9921' },
+    { id: 'CERT-2026-002', student: 'Budi Santoso', course: 'Word Professional', date: '08 Mei 2026', code: 'WAC-WD-1104' },
+    { id: 'CERT-2026-003', student: 'Ahmad Fauzi', course: 'PowerPoint Pro', date: '05 Mei 2026', code: 'WAC-PP-3392' },
+  ];
+
   return (
-    <div className="space-y-10">
-      <div className="flex items-center justify-between">
+    <div className="space-y-10 animate-slide-up pb-20">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
-          <h1 className="text-3xl font-black text-gray-900">Manajemen Sertifikat</h1>
-          <p className="text-gray-500 mt-1">Kelola penerbitan, desain, dan verifikasi sertifikat siswa.</p>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight italic">Manajemen <span className="text-blue-600">Sertifikat</span></h1>
+          <p className="text-slate-500 mt-1 text-sm font-medium">Kelola penerbitan, desain, dan verifikasi sertifikat siswa secara global.</p>
         </div>
-        <div className="flex gap-3">
-           <button className="px-6 py-3 bg-white border border-gray-200 text-gray-600 font-bold rounded-2xl text-sm hover:bg-gray-50 transition-all">
-             Desain Sertifikat
+        <div className="flex items-center gap-3">
+           <button className="px-5 py-2.5 bg-white border border-slate-200 text-slate-600 text-xs font-black rounded-xl hover:bg-slate-50 transition-all uppercase tracking-widest">
+             Template
            </button>
-           <button className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl text-sm hover:bg-blue-700 transition-all shadow-lg shadow-blue-100">
+           <button className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white text-xs font-black rounded-xl hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 uppercase tracking-widest">
              <Award size={18} /> Terbitkan Manual
            </button>
         </div>
@@ -26,72 +34,76 @@ export default function AdminCertificatesPage() {
 
       {/* Summary Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-gradient-to-br from-blue-600 to-blue-700 p-8 rounded-3xl text-white">
-           <p className="text-xs font-bold text-blue-100 uppercase tracking-widest mb-2">Total Sertifikat</p>
-           <h3 className="text-4xl font-black italic">1,248</h3>
-        </div>
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
-           <div>
-             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Verifikasi Bulan Ini</p>
-             <h3 className="text-2xl font-black text-gray-900">412</h3>
+        <div className="bg-slate-900 p-8 rounded-3xl text-white shadow-xl shadow-slate-900/20 relative overflow-hidden group">
+           <div className="relative z-10">
+              <p className="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">Total Sertifikat</p>
+              <h3 className="text-4xl font-black italic tracking-tighter">1,248</h3>
            </div>
-           <ShieldCheck size={32} className="text-green-500 opacity-20" />
+           <Award size={48} className="absolute -right-2 -bottom-2 text-white/5 group-hover:text-blue-500/20 group-hover:scale-125 transition-all" />
         </div>
-        <div className="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between">
            <div>
-             <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Menunggu Approval</p>
-             <h3 className="text-2xl font-black text-gray-900">0</h3>
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Verifikasi Valid</p>
+             <h3 className="text-2xl font-black text-slate-900 italic tracking-tighter">412</h3>
            </div>
-           <Award size={32} className="text-orange-500 opacity-20" />
+           <div className="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center">
+             <ShieldCheck size={24} />
+           </div>
+        </div>
+        <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between">
+           <div>
+             <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Pending Approval</p>
+             <h3 className="text-2xl font-black text-slate-900 italic tracking-tighter">0</h3>
+           </div>
+           <div className="w-12 h-12 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center">
+             <Clock size={24} />
+           </div>
         </div>
       </div>
 
-      {/* List */}
-      <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="p-6 border-b border-gray-50 flex items-center justify-between">
-           <h3 className="font-bold text-gray-900">Sertifikat Terbaru</h3>
-           <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2 px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl">
-                 <Search size={16} className="text-gray-400" />
-                 <input type="text" placeholder="Cari Kode / Nama..." className="bg-transparent border-none outline-none text-xs w-48" />
-              </div>
-              <button className="p-2.5 bg-gray-50 text-gray-400 hover:text-gray-900 rounded-xl transition-all border border-gray-100">
-                <Filter size={18} />
-              </button>
+      {/* List Area */}
+      <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="p-4 border-b border-slate-50 flex flex-col md:flex-row items-center justify-between gap-4">
+           <div className="relative flex-1 w-full">
+              <Search size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <input 
+                type="text" 
+                placeholder="Cari Kode Sertifikat atau Nama Siswa..." 
+                className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-100 rounded-xl text-xs outline-none focus:ring-2 focus:ring-blue-500/20 font-bold"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
            </div>
         </div>
+        
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full text-left">
             <thead>
-              <tr className="bg-gray-50/50">
-                <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Siswa</th>
-                <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Kursus</th>
-                <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Tanggal Terbit</th>
-                <th className="px-6 py-4 text-left text-[10px] font-black text-gray-400 uppercase tracking-widest">Kode Verifikasi</th>
-                <th className="px-6 py-4 text-center text-[10px] font-black text-gray-400 uppercase tracking-widest">Aksi</th>
+              <tr className="bg-slate-50/50 border-b border-slate-100">
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Siswa</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest">Kursus</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-center">Kode Verifikasi</th>
+                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-widest text-right">Aksi</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-slate-100">
               {ISSUED_CERTIFICATES.map(c => (
-                <tr key={c.id} className="hover:bg-gray-50 transition-colors">
+                <tr key={c.id} className="hover:bg-slate-50/50 transition-colors">
                   <td className="px-6 py-5">
-                    <p className="text-sm font-bold text-gray-900">{c.student}</p>
-                    <p className="text-[10px] text-gray-400">{c.id}</p>
+                    <p className="text-sm font-black text-slate-900 uppercase italic tracking-tighter">{c.student}</p>
+                    <p className="text-[10px] text-slate-400 font-bold">{c.id}</p>
                   </td>
                   <td className="px-6 py-5">
-                    <span className="text-xs font-semibold text-gray-600">{c.course}</span>
+                    <span className="text-xs font-bold text-slate-600 uppercase">{c.course}</span>
                   </td>
-                  <td className="px-6 py-5">
-                    <span className="text-xs text-gray-500">{c.date}</span>
+                  <td className="px-6 py-5 text-center">
+                    <code className="text-[10px] font-black bg-blue-50 text-blue-600 px-3 py-1 rounded-lg tracking-widest">{c.code}</code>
                   </td>
-                  <td className="px-6 py-5">
-                    <code className="text-[10px] font-black bg-blue-50 text-blue-600 px-2 py-1 rounded tracking-tighter">{c.code}</code>
-                  </td>
-                  <td className="px-6 py-5">
-                    <div className="flex items-center justify-center gap-3">
-                      <button title="Lihat Sertifikat" className="p-2 text-gray-400 hover:text-blue-600 transition-colors"><ExternalLink size={16} /></button>
-                      <button title="Download" className="p-2 text-gray-400 hover:text-gray-900 transition-colors"><Download size={16} /></button>
-                      <button className="p-2 text-gray-300 hover:text-gray-600 transition-colors"><MoreVertical size={16} /></button>
+                  <td className="px-6 py-5 text-right">
+                    <div className="flex justify-end gap-1">
+                      <button title="Lihat Sertifikat" className="p-2 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-all"><ExternalLink size={18} /></button>
+                      <button title="Download" className="p-2 text-slate-400 hover:text-slate-900 hover:bg-slate-100 rounded-lg transition-all"><Download size={18} /></button>
+                      <button className="p-2 text-slate-300 hover:text-slate-600 rounded-lg transition-all"><MoreVertical size={18} /></button>
                     </div>
                   </td>
                 </tr>
